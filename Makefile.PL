@@ -19,8 +19,10 @@ my %WriteMakefileArgs = (
   'EXE_FILES' => [],
   'LICENSE' => 'artistic_2',
   'NAME' => 'Dancer::Logger::Log4perl',
-  'PREREQ_PM' => {},
-  'VERSION' => '0.7.0_01',
+  'PREREQ_PM' => {
+    'Dancer' => '1.2003'
+  },
+  'VERSION' => '0.7.0_02',
   'test' => {
     'TESTS' => 't/*.t'
   }

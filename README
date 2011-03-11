@@ -2,7 +2,7 @@ NAME
     Dancer::Logger::Log4perl - Dancer adapter for Log::Log4perl
 
 VERSION
-    version 0.7.0_01
+    version 0.7.0_02
 
 SYNOPSIS
        # In your config.yml

@@ -1,6 +1,6 @@
 package Dancer::Logger::Log4perl;
 BEGIN {
-  $Dancer::Logger::Log4perl::VERSION = '0.7.0_01';
+  $Dancer::Logger::Log4perl::VERSION = '0.7.0_02';
 }
 
 # ABSTRACT: Dancer adapter for Log::Log4perl
@@ -59,7 +59,7 @@ Dancer::Logger::Log4perl - Dancer adapter for Log::Log4perl
 
 =head1 VERSION
 
-version 0.7.0_01
+version 0.7.0_02
 
 =head1 SYNOPSIS
 
