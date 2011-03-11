@@ -15,4 +15,4 @@ name: Dancer-Logger-Log4perl
 requires:
   Dancer: 1.2003
   perl: 5.008_000
-version: 0.7.0_02
+version: 0.7.0_03

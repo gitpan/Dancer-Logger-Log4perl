@@ -2,7 +2,7 @@ NAME
     Dancer::Logger::Log4perl - Dancer adapter for Log::Log4perl
 
 VERSION
-    version 0.7.0_02
+    version 0.7.0_03
 
 SYNOPSIS
        # In your config.yml
@@ -38,19 +38,30 @@ DESCRIPTION
 
 CONFIGURATION
     The configuration capabilities vary depending on the underlying library
-    you have.
+    you have, even though the following configurations are common:
+
+    no_init
+        skip the initialisation phase of the logging module, assuming that
+        it is performed elsewhere.
+
+    tiny
+        allows you to decide whether Log::Log4perl (when set to a false
+        value) or Log::Log4perl::Tiny (when set to a true value) should be
+        used.
 
   Log::Log4perl
     If you're using standard Log::Log4perl, then you have two alternatives
     to pass a configuration:
 
-    *   via a configuration file, using the "config_file" option:
+    config_file
+        via a configuration file, using the "config_file" option:
 
            logger: log4perl
            log4perl:
               config_file: log4perl.conf
 
-    *   via a straight configuration text, using the "config" option:
+    config
+        via a straight configuration text, using the "config" option:
 
            logger: log4perl
            log4perl:
@@ -62,29 +73,24 @@ CONFIGURATION
                  log4perl.appender.LOG1.layout    = Log::Log4perl::Layout::PatternLayout
                  log4perl.appender.LOG1.layout.ConversionPattern = %d %p %m %n
 
-    You can also decide to perform the configuration phase by yourself,
-    directly inside the program. In this case, the "no_init" option should
-    come handy.
-
   Log::Log4perl::Tiny
     If all you have is Log::Log4perl::Tiny, you can set some parameters:
 
-    *   the log "level"
+    level
+        the log "level"
 
-    *   the log "format" (aliased to "layout" as well)
+           logger: log4perl
+           log4perl:
+              tiny: 1
+              level: INFO
 
-    Again, you can decide to perform your own initialisation, in which case
-    it is adviseable to use the "no_init" option.
+    format
+        the log "format" (aliased to "layout" as well)
 
-INTERFACE
-  Logging Facilities
-    new the object constructor.
-
-    debug
-    core
-    warning
-    error
-        The four methods that a Dancer logger must have.
+           logger: log4perl
+           log4perl:
+              tiny: 1
+              format: [%p] %m%n
 
 AUTHOR
     Flavio Poletti <polettix@cpan.org>
