@@ -2,15 +2,17 @@ NAME
     Dancer::Logger::Log4perl - Dancer adapter for Log::Log4perl
 
 VERSION
-    version 0.8.0
+    version 0.8.1
 
 SYNOPSIS
-       # In your config.yml
+    In your config.yml
+
        logger: log4perl
        log4perl:
           config_file: log4perl.conf
 
-       # In your log4perl.conf
+    In your log4perl.conf
+
        log4perl.rootLogger              = DEBUG, LOG1
        log4perl.appender.LOG1           = Log::Log4perl::Appender::File
        log4perl.appender.LOG1.filename  = /var/log/mylog.log
@@ -211,6 +213,19 @@ EXAMPLES
           warning 'OUCH!';
           return ';-)';
        };
+
+SUPPORT
+    If you find a bug, have a comment or (constructive) criticism you have
+    different options:
+
+    -   just write to the "AUTHOR"
+
+    -   open a bug request on the relevant RT queue at
+        https://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Logger-Log4
+        perl
+
+    -   open an issue or propose a patch on GitHub at
+        https://github.com/polettix/Dancer-Logger-Log4perl
 
 AUTHOR
     Flavio Poletti <polettix@cpan.org>

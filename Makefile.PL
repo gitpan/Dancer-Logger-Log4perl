@@ -2,29 +2,29 @@
 use strict;
 use warnings;
 
-BEGIN { require 5.008_000; }
+use 5.008_000;
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Dancer adapter for Log::Log4perl',
-  'AUTHOR' => 'Flavio Poletti <polettix@cpan.org>',
-  'BUILD_REQUIRES' => {},
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31'
+  "ABSTRACT" => "Dancer adapter for Log::Log4perl",
+  "AUTHOR" => "Flavio Poletti <polettix\@cpan.org>",
+  "BUILD_REQUIRES" => {},
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
   },
-  'DISTNAME' => 'Dancer-Logger-Log4perl',
-  'EXE_FILES' => [],
-  'LICENSE' => 'artistic_2',
-  'NAME' => 'Dancer::Logger::Log4perl',
-  'PREREQ_PM' => {
-    'Dancer' => '1.2003'
+  "DISTNAME" => "Dancer-Logger-Log4perl",
+  "EXE_FILES" => [],
+  "LICENSE" => "artistic_2",
+  "NAME" => "Dancer::Logger::Log4perl",
+  "PREREQ_PM" => {
+    "Dancer" => "1.2003"
   },
-  'VERSION' => '0.8.0',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "0.8.1",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 

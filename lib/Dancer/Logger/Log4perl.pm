@@ -1,6 +1,6 @@
 package Dancer::Logger::Log4perl;
-BEGIN {
-  $Dancer::Logger::Log4perl::VERSION = '0.8.0';
+{
+  $Dancer::Logger::Log4perl::VERSION = '0.8.1';
 }
 
 # ABSTRACT: Dancer adapter for Log::Log4perl
@@ -59,16 +59,18 @@ Dancer::Logger::Log4perl - Dancer adapter for Log::Log4perl
 
 =head1 VERSION
 
-version 0.8.0
+version 0.8.1
 
 =head1 SYNOPSIS
 
-   # In your config.yml
+In your config.yml
+
    logger: log4perl
    log4perl:
       config_file: log4perl.conf
 
-   # In your log4perl.conf
+In your log4perl.conf
+
    log4perl.rootLogger              = DEBUG, LOG1
    log4perl.appender.LOG1           = Log::Log4perl::Appender::File
    log4perl.appender.LOG1.filename  = /var/log/mylog.log
@@ -313,6 +315,29 @@ and initialise the logging library inside the code:
       warning 'OUCH!';
       return ';-)';
    };
+
+=head1 SUPPORT
+
+If you find a bug, have a comment or (constructive) criticism you have
+different options:
+
+=over
+
+=item -
+
+just write to the L</AUTHOR>
+
+=item -
+
+open a bug request on the relevant RT queue at
+https://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Logger-Log4perl
+
+=item -
+
+open an issue or propose a patch on GitHub at
+https://github.com/polettix/Dancer-Logger-Log4perl
+
+=back
 
 =head1 AUTHOR
 
