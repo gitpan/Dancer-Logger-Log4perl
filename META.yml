@@ -5,14 +5,17 @@ author:
 build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: 6.30
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Dancer-Logger-Log4perl
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Dancer: 1.2003
-  perl: 5.008_000
-version: 0.8.1
+version: v0.9.0

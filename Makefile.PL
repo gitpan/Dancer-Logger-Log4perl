@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Dancer" => "1.2003"
   },
-  "VERSION" => "0.8.1",
+  "VERSION" => "0.9.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

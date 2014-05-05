@@ -1,16 +1,21 @@
 package Dancer::Logger::Log4perl;
-{
-  $Dancer::Logger::Log4perl::VERSION = '0.8.1';
-}
 
+#
 # ABSTRACT: Dancer adapter for Log::Log4perl
+#
 
 use strict;
+use warnings;
+use Carp;
+use base 'Dancer::Logger::Abstract';
+
 use Dancer::Config       ();
 use Dancer::ModuleLoader ();
 
+our $VERSION = '0.9.0';
+
 my $default_config = <<'END_OF_CONFIG';
-log4perl.logger = INFO, Screen
+log4perl.logger = ALL, Screen
 log4perl.appender.Screen = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr = 1
 log4perl.appender.Screen.stdout = 0
@@ -18,54 +23,61 @@ log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
 log4perl.appender.Screen.layout.ConversionPattern = [%d] [%-5p] %m%n
 END_OF_CONFIG
 
-sub new {
-   my $package = shift;
-   my $conf    = Dancer::Config::setting('log4perl');
-   my $class   = $conf->{tiny} ? 'Log::Log4perl::Tiny' : 'Log::Log4perl';
-   Dancer::ModuleLoader->require($class) or return;
-   if (!$conf->{no_init}) {
-      if ($conf->{tiny}) {
-         my $logger = $class->get_logger();
-         for my $accessor (qw( fh level layout format )) {
-            $logger->$accessor($conf->{$accessor})
-              if exists $conf->{$accessor};
-         }
-      } ## end if ($conf->{tiny})
-      else {
-         my $l4p_conf =
-             exists $conf->{config_file} ? $conf->{config_file}
-           : exists $conf->{config}      ? \$conf->{config}
-           :                               \$default_config;
-         Log::Log4perl::init($l4p_conf);
-      } ## end else [ if ($conf->{tiny})
-   } ## end if (!$conf->{no_init})
-   my $logger = $class->get_logger();
-   return bless \$logger, $package;
-} ## end sub new
+sub init {
+    my $self = shift;
+    $self->SUPER::init(@_);
 
-sub core    { ${$_[0]}->info($_[1]) }
-sub debug   { ${$_[0]}->debug($_[1]) }
-sub warning { ${$_[0]}->warn($_[1]) }
-sub error   { ${$_[0]}->error($_[1]) }
+    my $conf  = Dancer::Config::setting('log4perl');
+    my $class = $conf->{tiny} ? 'Log::Log4perl::Tiny' : 'Log::Log4perl';
+    $self->{class} = $class;
+
+    unless ( Dancer::ModuleLoader->require($class) ) {
+        carp "unable to load $class";
+        return;
+    }
+
+    if ( ! $conf->{no_init} ) {
+        if ( $conf->{tiny} ) {
+            my $logger = $class->get_logger();
+            for my $accessor (qw( fh level layout format )) {
+                if ( exists $conf->{$accessor} ) {
+                    $logger->$accessor($conf->{$accessor});
+                }
+            }
+        } else {
+            my $l4p_conf =
+                  exists $conf->{config_file} ? $conf->{config_file}
+                : exists $conf->{config}      ? \$conf->{config}
+                :                               \$default_config;
+            Log::Log4perl::init($l4p_conf);
+        }
+    }
+
+    $self->{logger} = $class->get_logger();
+}
+
+sub _log {
+    my ($self, $level, $message) = @_;
+
+    $level = 'warn' if $level eq 'warning';
+    $level = 'trace' if $level eq 'core';
+    my $format_level = $level;
+
+    # Adjust the caller level since we've introduced additional levels. Does not apply to Tiny module.
+    local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 3 if $self->{class} eq 'Log::Log4perl';
+
+    $self->{logger}->$level($self->format_message($format_level => $message));
+}
 
 1;
-
-
-=pod
-
-=head1 NAME
-
-Dancer::Logger::Log4perl - Dancer adapter for Log::Log4perl
-
-=head1 VERSION
-
-version 0.8.1
+__END__
 
 =head1 SYNOPSIS
 
 In your config.yml
 
    logger: log4perl
+   log: core
    log4perl:
       config_file: log4perl.conf
 
@@ -77,6 +89,7 @@ In your log4perl.conf
    log4perl.appender.LOG1.mode      = append
    log4perl.appender.LOG1.layout    = Log::Log4perl::Layout::PatternLayout
    log4perl.appender.LOG1.layout.ConversionPattern = %d %p %m %n
+
 
 =head1 DESCRIPTION
 
@@ -96,6 +109,20 @@ the initialisation.
 After initialisation, you can decide to use L<Dancer>'s functions or
 the ones provided by either L<Log::Log4perl> or L<Log::Log4perl::Tiny>,
 e.g. the stealth loggers in case of a simplified interface.
+
+Note that L<Dancer>'s C<log> and C<logger_format> options are still honored,
+which means you need to be aware of the following:
+
+C<logger_format> is still processed and becomes C<%m> in L<Log4perl>'s format
+placeholders. This allows you to pass L<Dancer> placeholders that aren't
+available as L<Log4perl> placeholders.
+
+L<Dancer>'s C<core> level messages are passed to L<Log4perl> as level C<trace>
+but will not be passed unless L<Dancer>'s C<log> config is C<core>.
+
+C<log> should be set a lower priority than the lowest priority as set in your
+L<Log4perl> configuration. If it isn't, L<Dancer::Logger::Abstract> will not
+pass the message to L<Log4perl>.
 
 =head1 CONFIGURATION
 
@@ -145,7 +172,9 @@ via a straight configuration text, using the C<config> option:
          log4perl.appender.LOG1.layout    = Log::Log4perl::Layout::PatternLayout
          log4perl.appender.LOG1.layout.ConversionPattern = %d %p %m %n
 
+
 =back
+
 
 =head2 Log::Log4perl::Tiny
 
@@ -181,7 +210,7 @@ the log C<format> (aliased to C<layout> as well)
 
 =item B<< debug >>
 
-=item B<< core >>
+=item B<< info >>
 
 =item B<< warning >>
 
@@ -214,6 +243,7 @@ file:
 
    # config.yml
    logger: log4perl
+   log: info
    log4perl:
       config_file: log4perl.conf
 
@@ -225,15 +255,17 @@ In your code:
       return ':-)';
    };
 
+
 =head2 Log::Log4perl, Manual Initialisation, Log::Log4perl Stealth Interface
 
 If you want to use L<Log::Log4perl>'s stealth interface, chances are you
 also want to avoid a full configuration file and rely upon C<easy_init()>.
-In this case, chances are that you'll perform initialisation by your own,
-so your configuration file will be bare bones:
+In this case, you will probably want to perform the initialisation by your
+own, so your configuration file will be bare bones:
 
    # config.yml
    logger: log4perl
+   log: info
    log4perl:
       no_init: 1
 
@@ -246,10 +278,11 @@ and your code will contain all the meat:
       return ';-)';
    };
 
+
 =head2 Log::Log4perl, Whatever Initialisation, Whatever Interface
 
 Whatever the method you use to initialise the logger (but take care to
-initialis it once and only once, see L<Log::Log4perl>), you can always
+initialise it once and only once, see L<Log::Log4perl>), you can always
 use both L<Dancer> and L<Log::Log4perl> functions:
 
    use Log::Log4perl qw( :easy );
@@ -279,6 +312,7 @@ options directly inside the configuration file:
 
    # config.yml
    logger: log4perl
+   log: debug
    log4perl:
       tiny: 1
       level: DEBUG
@@ -302,6 +336,7 @@ configuration file to a minimum:
 
    # config.yml
    logger: log4perl
+   log: info
    log4perl:
       tiny: 1
 
@@ -315,6 +350,7 @@ and initialise the logging library inside the code:
       warning 'OUCH!';
       return ';-)';
    };
+
 
 =head1 SUPPORT
 
@@ -338,24 +374,3 @@ open an issue or propose a patch on GitHub at
 https://github.com/polettix/Dancer-Logger-Log4perl
 
 =back
-
-=head1 AUTHOR
-
-Flavio Poletti <polettix@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2011 by Flavio Poletti polettix@cpan.org.
-
-This module is free software.  You can redistribute it and/or
-modify it under the terms of the Artistic License 2.0.
-
-This program is distributed in the hope that it will be useful,
-but without any warranty; without even the implied warranty of
-merchantability or fitness for a particular purpose.
-
-=cut
-
-
-__END__
-

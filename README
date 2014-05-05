@@ -1,13 +1,8 @@
-NAME
-    Dancer::Logger::Log4perl - Dancer adapter for Log::Log4perl
-
-VERSION
-    version 0.8.1
-
 SYNOPSIS
     In your config.yml
 
        logger: log4perl
+       log: core
        log4perl:
           config_file: log4perl.conf
 
@@ -23,20 +18,34 @@ SYNOPSIS
 DESCRIPTION
     This class is an interface between Dancer's logging engine abstraction
     layer and the Log::Log4perl library. In order to use it, you have to set
-    the "logger" engine to "log4perl".
+    the `logger' engine to `log4perl'.
 
     You can use either Log::Log4perl or Log::Log4perl::Tiny. If you want to
-    use the latter, just specify the "tiny" option in the specific
+    use the latter, just specify the `tiny' option in the specific
     configuration.
 
     You can decide to let the module perform the initialisation of the
     logging system, or you can do it by yourself. In the latter case, you
-    can pass the "no_init" parameter, which instructs the module not to
+    can pass the `no_init' parameter, which instructs the module not to
     perform the initialisation.
 
     After initialisation, you can decide to use Dancer's functions or the
     ones provided by either Log::Log4perl or Log::Log4perl::Tiny, e.g. the
     stealth loggers in case of a simplified interface.
+
+    Note that Dancer's `log' and `logger_format' options are still honored,
+    which means you need to be aware of the following:
+
+    `logger_format' is still processed and becomes `%m' in Log4perl's format
+    placeholders. This allows you to pass Dancer placeholders that aren't
+    available as Log4perl placeholders.
+
+    Dancer's `core' level messages are passed to Log4perl as level `trace'
+    but will not be passed unless Dancer's `log' config is `core'.
+
+    `log' should be set a lower priority than the lowest priority as set in
+    your Log4perl configuration. If it isn't, Dancer::Logger::Abstract will
+    not pass the message to Log4perl.
 
 CONFIGURATION
     The configuration capabilities vary depending on the underlying library
@@ -56,14 +65,14 @@ CONFIGURATION
     to pass a configuration:
 
     config_file
-        via a configuration file, using the "config_file" option:
+        via a configuration file, using the `config_file' option:
 
            logger: log4perl
            log4perl:
               config_file: log4perl.conf
 
     config
-        via a straight configuration text, using the "config" option:
+        via a straight configuration text, using the `config' option:
 
            logger: log4perl
            log4perl:
@@ -79,7 +88,7 @@ CONFIGURATION
     If all you have is Log::Log4perl::Tiny, you can set some parameters:
 
     level
-        the log "level"
+        the log `level'
 
            logger: log4perl
            log4perl:
@@ -87,7 +96,7 @@ CONFIGURATION
               level: INFO
 
     format
-        the log "format" (aliased to "layout" as well)
+        the log `format' (aliased to `layout' as well)
 
            logger: log4perl
            log4perl:
@@ -115,6 +124,7 @@ EXAMPLES
 
        # config.yml
        logger: log4perl
+       log: info
        log4perl:
           config_file: log4perl.conf
 
@@ -129,12 +139,13 @@ EXAMPLES
   Log::Log4perl, Manual Initialisation, Log::Log4perl Stealth Interface
     If you want to use Log::Log4perl's stealth interface, chances are you
     also want to avoid a full configuration file and rely upon
-    "easy_init()". In this case, chances are that you'll perform
+    `easy_init()'. In this case, you will probably want to perform the
     initialisation by your own, so your configuration file will be bare
     bones:
 
        # config.yml
        logger: log4perl
+       log: info
        log4perl:
           no_init: 1
 
@@ -149,7 +160,7 @@ EXAMPLES
 
   Log::Log4perl, Whatever Initialisation, Whatever Interface
     Whatever the method you use to initialise the logger (but take care to
-    initialis it once and only once, see Log::Log4perl), you can always use
+    initialise it once and only once, see Log::Log4perl), you can always use
     both Dancer and Log::Log4perl functions:
 
        use Log::Log4perl qw( :easy );
@@ -178,6 +189,7 @@ EXAMPLES
 
        # config.yml
        logger: log4perl
+       log: debug
        log4perl:
           tiny: 1
           level: DEBUG
@@ -200,6 +212,7 @@ EXAMPLES
 
        # config.yml
        logger: log4perl
+       log: info
        log4perl:
           tiny: 1
 
@@ -218,7 +231,7 @@ SUPPORT
     If you find a bug, have a comment or (constructive) criticism you have
     different options:
 
-    -   just write to the "AUTHOR"
+    -   just write to the AUTHOR
 
     -   open a bug request on the relevant RT queue at
         https://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Logger-Log4
@@ -226,17 +239,4 @@ SUPPORT
 
     -   open an issue or propose a patch on GitHub at
         https://github.com/polettix/Dancer-Logger-Log4perl
-
-AUTHOR
-    Flavio Poletti <polettix@cpan.org>
-
-COPYRIGHT AND LICENSE
-    Copyright (C) 2011 by Flavio Poletti polettix@cpan.org.
-
-    This module is free software. You can redistribute it and/or modify it
-    under the terms of the Artistic License 2.0.
-
-    This program is distributed in the hope that it will be useful, but
-    without any warranty; without even the implied warranty of
-    merchantability or fitness for a particular purpose.
 
